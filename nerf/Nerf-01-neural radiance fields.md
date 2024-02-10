@@ -80,7 +80,7 @@ PSNR（峰值信噪比）、SSIM（结构相似性指数）和LPIPS（感知相�
 
 ​		  1.通过优化权重 $\Theta$ 来从 Input5D坐标 映射到 C和 $\sigma$.
 
-​		  2.通过限制神经网络，只让 location $X=(x,y,z)$ 控制 volume density $\sigma$ 的预测，让 location $X $  和 viewing direction ($\theta, \phi$)一起预测color C. 【为了保持多视图的一致性】
+​		  2.通过限制神经网络，只让 location $X=(x,y,z)$ 控制 volume density $\sigma$ 的预测，让 location $X$  和 viewing direction ($\theta, \phi$)一起预测color C. 【为了保持多视图的一致性】
 
 ​		  3.MLP网络具体步骤如下：
 
@@ -100,7 +100,7 @@ $$
 \gamma(p) = (sin(2^{0}\pi p),cos(2^{0}\pi p),....,sin(2^{L-1}\pi p),cos(2^{L-1}\pi p)).
 $$
 
-所以，输入的3D  location $X=(x,y,z)$ 是三维，作者在实验中对于$X$的L值取10，所以新维度 = 3*2*L = 3*2*10 = 60。同理，$d$ 是3D笛卡尔单位向量，作者在实验中对于 $d$ 的L值取4，所以新维度就是24。
+所以，输入的3D  location $X=(x,y,z)$ 是三维，作者在实验中对于 $X$ 的L值取10，所以新维度 = 3*2*L = 3*2*10 = 60。同理，$d$ 是3D笛卡尔单位向量，作者在实验中对于 $d$ 的L值取4，所以新维度就是24。
 
 ***2. volume rendering with radiance fields***
 
@@ -115,7 +115,7 @@ $$
 
 $\sigma(r(t))$ 表示体密度，也是指density，$\bold c(·)$ 表示颜色。	
 
-$T(t)$ 表示的含义是accumulated transmittance along the ray from $t_n$ to $t_f$ ,也就是说是碰撞检测函数。当碰到第一个表面时，$\sigma$ 比较大，此时 $T(t)$ 迅速衰减为一个较小的数，所以当碰到第二个表面时，$T(t)$较小，则$C(r)$不会对后面的表面进行累积，也就是图2-c中将第二个波峰的能量剔除。
+$T(t)$ 表示的含义是accumulated transmittance along the ray from $t_n$ to $t_f$ ,也就是说是碰撞检测函数。当碰到第一个表面时， $\sigma$ 比较大，此时 $T(t)$ 迅速衰减为一个较小的数，所以当碰到第二个表面时，$T(t)$ 较小，则 $C(r)$ 不会对后面的表面进行累积，也就是图2-c中将第二个波峰的能量剔除。
 
 ​		2.实际上，计算机无法对连续的3D点进行处理，故将连续积分问题转换为可微的离散累积问题。将该问题进行离散化。
 
@@ -130,7 +130,10 @@ $$
 所以上（2）式就可以离散化为：
 
 $$
-\hat{C}(r) =  \sum_{i=1}^{N}T_{i}(1-e^{-\sigma_{i} \delta_{i} })\bold c_{i} \\
+\hat{C}(r) =  \sum_{i=1}^{N}T_{i}(1-e^{-\sigma_{i} \delta_{i} }) \boldsymbol c_{i} 
+$$
+
+$$
 T_i= e^{- \sum_{j=1}^{i-1}\sigma_{j} \delta_{j}} \\
 $$
 
@@ -140,14 +143,21 @@ $$
 
 ​	NeRF的渲染过程计算量很大，每条射线都要采样很多点。但实际上，一条射线上的大部分区域都是空区域，或者是被遮挡的区域，对最终的颜色没有啥贡献。因此，作者采用了一种“coarse to fine" 的形式，同时优化coarse 网络和fine 网络。
 
-​	首先对于coarse网络，可以先采样较为稀疏的$N_c$个点 ，并将（4）式中的离散求和函数重新表示为：
+​	首先对于coarse网络，可以先采样较为稀疏的$N_c$个点 ，并将上式中的离散求和函数重新表示为：
 
 $$
-\hat{C}_{c}(r) =  \sum_{i=1}^{N_c} w_i  \bold c_{i}  \ , \\
-w_i = T_{i}(1-e^{-\sigma_{i} \delta_{i} }) \ \ \ \ , \  T_i= e^{- \sum_{j=1}^{i-1}\sigma_{j} \delta_{j}} \\
+\hat{C}_{c}(r) =  \sum_{i=1}^{N_c} w_i  \boldsymbol c_{i} 
 $$
 
-​	接下来，对$w_i$进行归一化：
+$$
+w_i = T_{i}(1-e^{-\sigma_{i} \delta_{i} })  
+$$
+
+$$
+T_i= e^{- \sum_{j=1}^{i-1}\sigma_{j} \delta_{j}} 
+$$
+
+​接下来，对 $w_i$ 进行归一化：
 
 $$
 \hat{w}_{i} = \frac{w_i}{\sum_{j=1}^{N_c}w_j}
