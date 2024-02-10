@@ -100,7 +100,7 @@ $$
 \gamma(p) = (sin(2^{0}\pi p),cos(2^{0}\pi p),....,sin(2^{L-1}\pi p),cos(2^{L-1}\pi p)).
 $$
 
-所以，输入的3D  location $X=(x,y,z)$ 是三维，作者在实验中对于$X$的L值取10，所以新维度 = $3*2*L = 3*2*10$ = 60。同理，$d$是3D笛卡尔单位向量，作者在实验中对于$d$的L值取4，所以新维度就是24。
+所以，输入的3D  location $X=(x,y,z)$ 是三维，作者在实验中对于$X$的L值取10，所以新维度 = 3*2*L = 3*2*10 = 60。同理，$d$ 是3D笛卡尔单位向量，作者在实验中对于 $d$ 的L值取4，所以新维度就是24。
 
 *** 2. volume rendering with radiance fields***
 
@@ -111,6 +111,7 @@ $$
 C(\boldsymbol r) = \int_{t_{n}}^{t_{f}}T(t) \sigma( \boldsymbol r(t)) \boldsymbol c(\boldsymbol r(t), \boldsymbol d)dt, \\
 where \ T(t) = e^{-\int_{t_{n}}^{t}\sigma( \boldsymbol r(s))ds }.
 $$
+
 $\sigma(r(t))$ 表示体密度，也是指density，$\bold c(·)$ 表示颜色。	
 
 $T(t)$ 表示的含义是accumulated transmittance along the ray from $t_n$ to $t_f$ ,也就是说是碰撞检测函数。当碰到第一个表面时，$\sigma$ 比较大，此时 $T(t)$ 迅速衰减为一个较小的数，所以当碰到第二个表面时，$T(t)$较小，则$C(r)$不会对后面的表面进行累积，也就是图2-c中将第二个波峰的能量剔除。
@@ -123,11 +124,14 @@ $T(t)$ 表示的含义是accumulated transmittance along the ray from $t_n$ to $
 $$
 t_{i} \sim u[t_n+\frac{i-1}{N}(t_{f}-t_n),t_n+\frac{i}{N}(t_{f}-t_n)]
 $$
+
 所以上（2）式就可以离散化为：
+
 $$
 \hat{C}(r) =  \sum_{i=1}^{N}T_{i}(1-e^{-\sigma_{i} \delta_{i} })\bold c_{i} \\
 T_i= e^{- \sum_{j=1}^{i-1}\sigma_{j} \delta_{j}} \\
 $$
+
 其中$\delta_{i} = t_{i+1}-t_{i}$ ，是相邻样本之间的距离。
 
 **细采样【fine network】:**
@@ -135,14 +139,18 @@ $$
 ​	NeRF的渲染过程计算量很大，每条射线都要采样很多点。但实际上，一条射线上的大部分区域都是空区域，或者是被遮挡的区域，对最终的颜色没有啥贡献。因此，作者采用了一种“coarse to fine" 的形式，同时优化coarse 网络和fine 网络。
 
 ​	首先对于coarse网络，可以先采样较为稀疏的$N_c$个点 ，并将（4）式中的离散求和函数重新表示为：
+
 $$
 \hat{C}_{c}(r) =  \sum_{i=1}^{N_c} w_i  \bold c_{i}  \ , \\
 w_i = T_{i}(1-e^{-\sigma_{i} \delta_{i} }) \ \ \ \ , \  T_i= e^{- \sum_{j=1}^{i-1}\sigma_{j} \delta_{j}} \\
 $$
+
 ​	接下来，对$w_i$进行归一化：
+
 $$
 \hat{w}_{i} = \frac{w_i}{\sum_{j=1}^{N_c}w_j}
 $$
+
 作者选用了标准化的归一化方法，这样的目的是确保数据的所有值的总和等于特定的值1，这样就可以把 $\hat{w}_{i} $ 看做是沿着射线的概率密度函数。so，通过这个概率密度函数，就可以粗略的得到射线上物体的分布情况。
 
 接下来，再基于得到的概率密度函数来采样$N_f$个点，并用这 $N_f$个点和前面的 $N_c$个点一同计算fine 网络的渲染结果 $\hat{C}_{f}(r)$.
@@ -255,12 +263,16 @@ $$
 4. **关于体渲染的离散公式推导与代码实现**
 
 将$[t_{n},t_{f}]$ 均分成为N份，然后从每份里面随机均匀的抽取样本。
+
 $$
 t_{i} \sim u[t_n+\frac{i-1}{N}(t_{f}-t_n),t_n+\frac{i}{N}(t_{f}-t_n)]
 $$
+
 所以上（2）式就可以离散化为：
+
 $$
 \hat{C}(r) =  \sum_{i=1}^{N}T_{i}(1-e^{-\sigma_{i} \delta_{i} })\bold c_{i} \\
 T_i= e^{- \sum_{j=1}^{i-1}\sigma_{j} \delta_{j}} \\
 $$
+
 ![image-20231129104231623](/asset/nerf/01-image/image-20231129104231623.png)
