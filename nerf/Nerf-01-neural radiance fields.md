@@ -60,7 +60,7 @@ PSNR（峰值信噪比）、SSIM（结构相似性指数）和LPIPS（感知相�
 
 ##### 2.具体方法
 
-![model](./asset/nerf/01-image/截屏2023-10-19 10.35.31.png)
+![model](/asset/nerf/01-image/截屏2023-10-19 10.35.31.png)
 
 ​	**模型的主要思路：**
 
@@ -76,28 +76,30 @@ PSNR（峰值信噪比）、SSIM（结构相似性指数）和LPIPS（感知相�
 
 ​	2）Output:  an emitted color $C=(r,g,b)$  and volume density $\sigma$ [体积密度，或者说透明度].
 
-​	3）使用3D笛卡尔单位向量 $d$ 表示射线方向，so 使用MLP网络$ F_{\Theta}:(X,d) \rightarrow (c,\sigma)$ . 其中：
+​	3）使用3D笛卡尔单位向量 $d$ 表示射线方向，so 使用MLP网络 $F_{\Theta}:(X,d) \rightarrow (c,\sigma)$ . 其中：
 
-​		  1.通过优化权重$\Theta$ 来从 Input5D坐标 映射到 C和$\sigma$.
+​		  1.通过优化权重$\Theta$ 来从 Input5D坐标 映射到 C和 $\sigma$.
 
-​		  2.通过限制神经网络，只让 location $X=(x,y,z)$ 控制 volume density $\sigma$ 的预测，让 location $X $  和 viewing direction ($\theta, \phi $)一起预测color C. 【为了保持多视图的一致性】
+​		  2.通过限制神经网络，只让 location $X=(x,y,z)$ 控制 volume density $\sigma$ 的预测，让 location $X $  和 viewing direction ($\theta, \phi$)一起预测color C. 【为了保持多视图的一致性】
 
 ​		  3.MLP网络具体步骤如下：
 
 ​				（1）使用8个全连接层来处理输入的3D  location $X=(x,y,z)$ 【使用ReLU激活和每层256个通道】，然后输出σ和256维特征向量；
 
-​				（2）将该特征向量与相机2D viewing direction ($\theta, \phi $) 拼接，然后使用全连接层【使用ReLU激活和128通道】进行处理，得到输出的RGB颜色值。
+​				（2）将该特征向量与相机2D viewing direction ($\theta, \phi$) 拼接，然后使用全连接层【使用ReLU激活和128通道】进行处理，得到输出的RGB颜色值。
 
-![截屏2023-10-19 14.42.08](./asset/nerf/01-image/截屏2023-10-19 14.42.08.png)
+![截屏2023-10-19 14.42.08](/asset/nerf/01-image/截屏2023-10-19 14.42.08.png)
 
 <font color=#9D1420> 疑问 : </font> y(x) 两次输入的60是什么含义？还有输入的24有是什么含义？
 
 答案：在5.1部分【Positional encoding】，作者提出了一种优化思想，即在将坐标输入网络之前进行一个高频函数映射，这样可以更好的拟合包含高频变化的数据。
 
-$\gamma $  函数是用来映射空间$R$ 到高维的 $R^{2L}$.
+$\gamma $  函数是用来映射空间 $R$ 到高维的 $R^{2L}$.
+
 $$
 \gamma(p) = (sin(2^{0}\pi p),cos(2^{0}\pi p),....,sin(2^{L-1}\pi p),cos(2^{L-1}\pi p)).
 $$
+
 所以，输入的3D  location $X=(x,y,z)$ 是三维，作者在实验中对于$X$的L值取10，所以新维度 = $3*2*L = 3*2*10$ = 60。同理，$d$是3D笛卡尔单位向量，作者在实验中对于$d$的L值取4，所以新维度就是24。
 
 *** 2. volume rendering with radiance fields***
@@ -145,7 +147,7 @@ $$
 
 接下来，再基于得到的概率密度函数来采样$N_f$个点，并用这 $N_f$个点和前面的 $N_c$个点一同计算fine 网络的渲染结果 $\hat{C}_{f}(r)$.
 
-<img src="./asset/nerf/01-image/image-20231102170239469.png" alt="image-20231102170239469" style="zoom: 50%;" />
+<img src="/asset/nerf/01-image/image-20231102170239469.png" alt="image-20231102170239469" style="zoom: 50%;" />
 
 **Loss function:**
 
@@ -188,7 +190,7 @@ $$
 
 ​	==1.为了唯一地描述每一个空间点的坐标以及相机的位置和朝向，我们需要先定义一个世界坐标系。==
 
-<img src="./asset/nerf/01-image/image-20231124160447282.png" alt="image-20231124160447282" style="zoom:50%;" />
+<img src="/asset/nerf/01-image/image-20231124160447282.png" alt="image-20231124160447282" style="zoom:50%;" />
 
 ​		其中：
 
@@ -248,7 +250,7 @@ $$
 
 过程如下：
 
-<img src="./asset/nerf/01-image/草稿纸-4.jpg" alt="草稿纸-4" style="zoom:25%;" />
+<img src="/asset/nerf/01-image/草稿纸-4.jpg" alt="草稿纸-4" style="zoom:25%;" />
 
 4. **关于体渲染的离散公式推导与代码实现**
 
@@ -261,4 +263,4 @@ $$
 \hat{C}(r) =  \sum_{i=1}^{N}T_{i}(1-e^{-\sigma_{i} \delta_{i} })\bold c_{i} \\
 T_i= e^{- \sum_{j=1}^{i-1}\sigma_{j} \delta_{j}} \\
 $$
-![image-20231129104231623](./asset/nerf/01-image/image-20231129104231623.png)
+![image-20231129104231623](/asset/nerf/01-image/image-20231129104231623.png)
