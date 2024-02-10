@@ -14,7 +14,7 @@
 
 ​	要理解NeRF是如何从一系列2D图像中学习到3D场景，又是如何渲染出2D图像。
 
-2. 输入具体有什么？每个模块的具**<u>体输入输出有什么</u>**，每个**<u>模块是如何工作的</u>**？分为以下几个部分回答： 
+2. 输入具体有什么？每个模块的具体输入输出有什么，每个模块是如何工作的？分为以下几个部分回答： 
 
 - 光线生成模块
 - 光线点采样模块
@@ -78,7 +78,7 @@ PSNR（峰值信噪比）、SSIM（结构相似性指数）和LPIPS（感知相�
 
 ​	3）使用3D笛卡尔单位向量 $d$ 表示射线方向，so 使用MLP网络 $F_{\Theta}:(X,d) \rightarrow (c,\sigma)$ . 其中：
 
-​		  1.通过优化权重$\Theta$ 来从 Input5D坐标 映射到 C和 $\sigma$.
+​		  1.通过优化权重 $\Theta$ 来从 Input5D坐标 映射到 C和 $\sigma$.
 
 ​		  2.通过限制神经网络，只让 location $X=(x,y,z)$ 控制 volume density $\sigma$ 的预测，让 location $X $  和 viewing direction ($\theta, \phi$)一起预测color C. 【为了保持多视图的一致性】
 
@@ -102,11 +102,12 @@ $$
 
 所以，输入的3D  location $X=(x,y,z)$ 是三维，作者在实验中对于$X$的L值取10，所以新维度 = 3*2*L = 3*2*10 = 60。同理，$d$ 是3D笛卡尔单位向量，作者在实验中对于 $d$ 的L值取4，所以新维度就是24。
 
-*** 2. volume rendering with radiance fields***
+***2. volume rendering with radiance fields***
 
 ​	1.classical volume rendering：
 
-​		The expected color $C(r)$ of camera ray $ r(t) = o + td $   with near and far bounds $t_n$ and $t_f$ is
+​		The expected color $C(r)$ of camera ray $r(t) = o + td$   with near and far bounds $t_n$ and $t_f$ is
+
 $$
 C(\boldsymbol r) = \int_{t_{n}}^{t_{f}}T(t) \sigma( \boldsymbol r(t)) \boldsymbol c(\boldsymbol r(t), \boldsymbol d)dt, \\
 where \ T(t) = e^{-\int_{t_{n}}^{t}\sigma( \boldsymbol r(s))ds }.
@@ -120,7 +121,8 @@ $T(t)$ 表示的含义是accumulated transmittance along the ray from $t_n$ to $
 
 **粗采样【coarse network】**：
 
-​		将$[t_{n},t_{f}]$ 均分成为N份，然后从每份里面随机均匀的抽取样本。
+​		将 $[t_{n},t_{f}]$ 均分成为N份，然后从每份里面随机均匀的抽取样本。
+
 $$
 t_{i} \sim u[t_n+\frac{i-1}{N}(t_{f}-t_n),t_n+\frac{i}{N}(t_{f}-t_n)]
 $$
@@ -132,7 +134,7 @@ $$
 T_i= e^{- \sum_{j=1}^{i-1}\sigma_{j} \delta_{j}} \\
 $$
 
-其中$\delta_{i} = t_{i+1}-t_{i}$ ，是相邻样本之间的距离。
+其中 $\delta_{i} = t_{i+1}-t_{i}$ ，是相邻样本之间的距离。
 
 **细采样【fine network】:**
 
@@ -180,7 +182,10 @@ $$
 The expected color $C(r)$ of camera ray $r(t) = o + td$   ：
 
 $$
-\hat{C}(r) =  \sum_{i=1}^{N}T_{i}(1-e^{-\sigma_{i} \delta_{i} })\bold c_{i} \\
+\hat{C}(r) =  \sum_{i=1}^{N}T_{i}(1-e^{-\sigma_{i} \delta_{i} })c_{i}
+$$
+
+$$
 T_i= e^{- \sum_{j=1}^{i-1}\sigma_{j} \delta_{j}} \\
 $$
 
@@ -198,7 +203,7 @@ $$
 
 ​	我们要做的是：生成每个方向下的像素点到光心的单位方向( z轴为单位1)，通过这个单位方向，可以通过调整z轴的坐标来生成空间中每一个点坐标，借此模拟出一条光线。这个射线是怎么构造的。**给定一张图像的一个像素点，我们的目标是构造以相机中心为起始点，经过相机中心和像素点的射线。**该像素点就是位于成像平面的像素点。
 
-​	==1.为了唯一地描述每一个空间点的坐标以及相机的位置和朝向，我们需要先定义一个世界坐标系。==
+​	1.为了唯一地描述每一个空间点的坐标以及相机的位置和朝向，我们需要先定义一个世界坐标系。
 
 <img src="/asset/nerf/01-image/image-20231124160447282.png" alt="image-20231124160447282" style="zoom:50%;" />
 
@@ -206,13 +211,13 @@ $$
 
 ​		1）**相机的位置和朝向：由外参决定【外参 World-To-camera，w2c】。**
 
-​			外参：4*4的矩阵M，作用是将世界坐标系的点$P_{world} = [x,y,z,1]$变换到相机坐标系$P_{camera}$下：
+​			外参：4*4的矩阵M，作用是将世界坐标系的点 $P_{world} = [x,y,z,1]$ 变换到相机坐标系 $P_{camera}$ 下：
 
 $$
 P_{camera} = MP_{world}
 $$
 
-​			相机外参的==逆矩阵==被称为**camera-to-world (c2w)矩阵**，左上角3x3是旋转矩阵R，右上角的3x1向量是平移向量T：
+​			相机外参的逆矩阵被称为**camera-to-world (c2w)矩阵**，左上角3x3是旋转矩阵R，右上角的3x1向量是平移向量T：
 
 $$
 c2w = \begin{bmatrix}
@@ -258,7 +263,7 @@ $$
 
 ​			<u>内参由焦距、图像的宽、高得到。</u>		
 
-​	==2.Nerf：NeRF所做的是在相机坐标系下构建射线，然后再通过camera-to-world (c2w)矩阵将射线变换到世界坐标系。==
+​	2.Nerf：NeRF所做的是在相机坐标系下构建射线，然后再通过camera-to-world (c2w)矩阵将射线变换到世界坐标系。
 
 ​		step1 ：写出相机中心、像素点在相机坐标系下的3D坐标
 
@@ -270,7 +275,7 @@ $$
 
 4. **关于体渲染的离散公式推导与代码实现**
 
-将$[t_{n},t_{f}]$ 均分成为N份，然后从每份里面随机均匀的抽取样本。
+将 $[t_{n},t_{f}]$ 均分成为N份，然后从每份里面随机均匀的抽取样本。
 
 $$
 t_{i} \sim u[t_n+\frac{i-1}{N}(t_{f}-t_n),t_n+\frac{i}{N}(t_{f}-t_n)]
@@ -279,7 +284,10 @@ $$
 所以上（2）式就可以离散化为：
 
 $$
-\hat{C}(r) =  \sum_{i=1}^{N}T_{i}(1-e^{-\sigma_{i} \delta_{i} }) \bold c_{i} \\
+\hat{C}(r) =  \sum_{i=1}^{N}T_{i}(1-e^{-\sigma_{i} \delta_{i} })c_{i} 
+$$
+
+$$
 T_i= e^{- \sum_{j=1}^{i-1}\sigma_{j} \delta_{j}} \\
 $$
 
