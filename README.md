@@ -10,5 +10,7 @@
     ├── Nerf-03-完全显式建模.pdf
     ├── Nerf-04-动态场景问题.pdf
     └── Nerf-05-散射与去雾.pdf
-
+└── 多模态 : 3D+大模型+少量nlp
+    ├── 多模态-01-LL3DA.pdf
+    └── 多模态-02-SceneFormer.pdf
 ```
