@@ -14,4 +14,5 @@
     ├── 多模态-01-LL3DA.pdf
     ├── 多模态-02-SceneFormer.pdf
     └── 多模态-03-diffusion base.pdf
+└── 配置环境踩过的坑.md
 ```
