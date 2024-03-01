@@ -13,6 +13,7 @@
 └── 多模态 : 3D+大模型+少量nlp
     ├── 多模态-01-LL3DA.pdf
     ├── 多模态-02-SceneFormer.pdf
-    └── 多模态-03-diffusion base.pdf
+    ├── 多模态-03-diffusion base.pdf
+    └── 多模态-04-点云的多模态基础模型.pdf
 └── 配置环境踩过的坑.md
 ```
