@@ -22,6 +22,7 @@
     ├── 4.数据集与项目工程不在同一路径的问题.md
     ├── 5.文件传输的问题.md
     ├── 6.解决anaconda占据位置过大的问题.md
-    └── 7.nerfstudio安装环境报错.md
+    ├── 7.nerfstudio安装环境报错.md
+    └── 8.Docker的使用.md
     
 ```
