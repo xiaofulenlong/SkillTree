@@ -23,6 +23,8 @@
     ├── 5.文件传输的问题.md
     ├── 6.解决anaconda占据位置过大的问题.md
     ├── 7.nerfstudio安装环境报错.md
-    └── 8.Docker的使用.md
+    ├── 8.Docker的使用.md
+    ├── 9.open3d报错问题.md
+    └── 10.动态链接库问题.md
     
 ```
